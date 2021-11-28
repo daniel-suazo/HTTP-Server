@@ -154,8 +154,11 @@ public class connHandler extends Thread {
       // Send the file
       byteOutputStream.write(bytes);
       byte[] allBytes = byteOutputStream.toByteArray();
-      System.out.println(new String(comCodes.OK.getBytes()));
+      System.out.print(new String(comCodes.OK.getBytes()));
+      System.out.print(new String(("Content-Length: " + bytes.length + "\r\n").getBytes()));
       clientOutputStream.write(comCodes.OK.getBytes());
+      clientOutputStream.write(("Content-Length: " + bytes.length + "\r\n").getBytes());
+      clientOutputStream.write("\r\n".getBytes());
       clientOutputStream.write(bytes);
       clientOutputStream.flush();
 

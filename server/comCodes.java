@@ -16,7 +16,7 @@ public class comCodes {
   public static final int PUT = 3;
 
   // Close connection
-  public static final int CLOSECONNECTION = 4;
+  public static final String CLOSECONNECTION = "HTTP/1.1 200 CLOSECONNECTION \r\n";
 
   // Error messages---------------------------------------------------
   // File not found
