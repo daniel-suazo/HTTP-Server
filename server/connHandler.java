@@ -2,6 +2,7 @@ package server;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.net.Socket;
@@ -54,13 +55,14 @@ public class connHandler extends Thread {
     try {
       ArrayList<String> command = new ArrayList<String>();
       String nextLine;
+      System.out.println("Client " + 1);
       do {
         // Wait for command
-        System.out.println("waiting for a command");
+
         nextLine = clientInputStream.readLine();
         command.add(nextLine);
 
-        System.out.println("Received Command: " + nextLine + " from client " + this.clientId);
+        System.out.println(nextLine);
       } while (nextLine != null && !nextLine.isBlank());
       // System.out.println(command);
 
@@ -70,9 +72,9 @@ public class connHandler extends Thread {
       ArrayList<String> params = parser.getParams();
 
       switch (commandType) {
-      case "GET":
-        getCommand(params);
-        break;
+        case "GET":
+          getCommand(params);
+          break;
       }
       // System.out.println(commandType);
       // for (int i = 0; i < params.size(); i++) {
@@ -97,7 +99,7 @@ public class connHandler extends Thread {
 
   private void exitCommand() {
     try {
-      clientOutputStream.writeInt(comCodes.OK);
+      // clientOutputStream.writeInt(comCodes.OK);
       clientOutputStream.flush();
       System.out.println("The connection has been closed! \n client: " + clientId);
     } catch (Exception e) {
@@ -117,21 +119,23 @@ public class connHandler extends Thread {
     byte[] buffer = new byte[comCodes.BUFFER_SIZE];
     int totalRead = 0;
 
+    ByteArrayOutputStream byteOutputStream = new ByteArrayOutputStream();
+
     System.out.println("Get Command");
 
     try {
-      int read;
 
       // // Write the OK code: make acknowledgment of GET command
-      // clientOutputStream.writeInt(comCodes.OK);
+      byteOutputStream.write(comCodes.OK.getBytes());
+
       // clientOutputStream.flush();
 
       // print the file name
       System.out.println("get " + params.get(0));
 
       // Send confirmation to the client
-      clientOutputStream.writeInt(comCodes.OK);
-      clientOutputStream.flush();
+      // clientOutputStream.writeInt(comCodes.OK);
+      // clientOutputStream.flush();
 
       // Save current time for computing transmission time
       long startTime = System.currentTimeMillis();
@@ -144,10 +148,15 @@ public class connHandler extends Thread {
 
       String currentDir = System.getProperty("user.dir");
       System.out.println(Paths.get(currentDir + "/files/" + params.get(0)));
-      byte[] bytes = Files.readAllBytes(Paths.get(currentDir + "/files/" + params.get(0)));
+      byte[] bytes = Files.readAllBytes(Paths.get(currentDir + "/files/" +
+          params.get(0)));
 
       // Send the file
-      clientOutputStream.write(bytes, 0, bytes.length);
+      byteOutputStream.write(bytes);
+      byte[] allBytes = byteOutputStream.toByteArray();
+      System.out.println(new String(comCodes.OK.getBytes()));
+      clientOutputStream.write(comCodes.OK.getBytes());
+      clientOutputStream.write(bytes);
       clientOutputStream.flush();
 
       long endTime = System.currentTimeMillis();
@@ -177,7 +186,7 @@ public class connHandler extends Thread {
       int read;
 
       // Write the OK code: make acknowledgment of PUT command
-      clientOutputStream.writeInt(comCodes.OK);
+      // clientOutputStream.writeInt(comCodes.OK);
       clientOutputStream.flush();
 
       // Wait for file name
@@ -188,7 +197,7 @@ public class connHandler extends Thread {
       System.out.println("put " + (new String(buffer)));
 
       // Send confirmation to the client
-      clientOutputStream.writeInt(comCodes.OK);
+      // clientOutputStream.writeInt(comCodes.OK);
       clientOutputStream.flush();
 
       // Save current time for computing transmission time

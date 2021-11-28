@@ -7,7 +7,7 @@ public class comCodes {
 
   // Data transfer codes-------------------------------------------
   // OK
-  public static final int OK = 200;
+  public static final String OK = "HTTP/1.1 200 OK \r\n";
 
   // Get
   public static final int GET = 2;
